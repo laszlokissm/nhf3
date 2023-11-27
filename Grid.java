@@ -27,20 +27,30 @@ public class Grid extends JFrame implements Serializable{
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         
         //Parameterkent kapott adatok atalakitasa
-        neededToBorn = new ArrayList<>((b.length()+1)/2);
+        neededToBorn = new ArrayList<Integer>((b.length()+1)/2);
         String[] tempb = b.split(";");
-        for (int i = 0; i < neededToBorn.size(); i++) {
+        for (int i = 0; i < (b.length()+1)/2; i++) {
             neededToBorn.add(i, Integer.parseInt(tempb[i]));
         }
         
-        neededToSurvive = new ArrayList<>((s.length()+1)/2);
+        neededToSurvive = new ArrayList<Integer>((s.length()+1)/2);
         String[] temps = s.split(";");
-        for (int i = 0; i < neededToSurvive.size(); i++) {
-            neededToBorn.add(i, Integer.parseInt(temps[i]));
+        for (int i = 0; i < (s.length()+1)/2; i++) {
+            neededToSurvive.add(i, Integer.parseInt(temps[i]));
         }
 
         gridSize=size;
         
+        /*
+         * Check int arrays
+         */
+        for (int i = 0; i < neededToBorn.size(); i++) {
+            System.out.println(neededToBorn.get(i));
+        }
+        for (int i = 0; i < neededToSurvive.size(); i++) {
+            System.out.println(neededToSurvive.get(i));
+        }
+
         //Timer inicializalasa
         timer= new Timer(time, e -> updateGrid());
         
