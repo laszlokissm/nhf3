@@ -21,6 +21,7 @@ public class Main extends JFrame {
         JButton startButton = new JButton("Inditas");
         JButton exitButton = new JButton("Kilepes");
         JButton loadButton = new JButton("Betoltes");
+        JButton randomButton = new JButton("Inditas veletlenszeru alaphelyzettel");
         JTextField bornTextField = new JTextField(5);
         JTextField surviveTextField = new JTextField(5);
         JTextField sizeTextField = new JTextField(5);
@@ -29,15 +30,18 @@ public class Main extends JFrame {
         JLabel sizeLabel = new JLabel("Meret");
         JPanel fields = new JPanel();
         JPanel botButtonsPanel = new JPanel(new BorderLayout());
+        JPanel topButtonsPanel = new JPanel(new BorderLayout());
         botButtonsPanel.add(loadButton,BorderLayout.NORTH);
         botButtonsPanel.add(exitButton,BorderLayout.SOUTH);
+        topButtonsPanel.add(randomButton,BorderLayout.SOUTH);
+        topButtonsPanel.add(startButton,BorderLayout.NORTH);
         fields.add(bornLabel);
         fields.add(bornTextField);
         fields.add(surviveLabel);
         fields.add(surviveTextField);
         fields.add(sizeLabel);
         fields.add(sizeTextField);
-        add(startButton,BorderLayout.NORTH);
+        add(topButtonsPanel,BorderLayout.NORTH);
         add(fields,BorderLayout.CENTER);
         add(botButtonsPanel,BorderLayout.SOUTH);
 
@@ -52,7 +56,7 @@ public class Main extends JFrame {
             }
         });
         
-        /* 
+        
         loadButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
                 File input=new File("a.ser");
@@ -60,13 +64,14 @@ public class Main extends JFrame {
 		        try {
 			        o = new ObjectInputStream(new FileInputStream(input));
 			        g = (Grid)o.readObject();
+                    //g.updateGrid();
                     g.run();
                     o.close();
 		        }catch(IOException | ClassNotFoundException err ) {throw new RuntimeException(err);}
-		
+                
             }
         });
-        */
+        
         
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e){
@@ -80,7 +85,18 @@ public class Main extends JFrame {
             }
         });
 
+        randomButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                setBorn(bornTextField.getText());
+                setSurvive(surviveTextField.getText());
+                if(sizeTextField.getText()!=null) setSize(Integer.parseInt(sizeTextField.getText()));
+                
+                g = new Grid(born, survive, size);
+                g.random();
+                
 
+            }
+        });
 
 
         pack();

@@ -6,8 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Random;
 
-public class Grid extends JFrame /*implements Serializable*/{
+public class Grid extends JFrame implements Serializable{
     //private static final long serialVersionUID = 6529685098267757690L;
     
     private int gridSize = 50;
@@ -16,7 +17,7 @@ public class Grid extends JFrame /*implements Serializable*/{
     private Timer timer;
     private int[] neededToBorn;
     private int[] neededToSurvive;
-
+    JPanel buttonPanel;
 
     public Grid(String b, String s,int size){
         neededToBorn = new int[(b.length()+1)/2];
@@ -76,6 +77,10 @@ public class Grid extends JFrame /*implements Serializable*/{
         timeTextField.setText(time + "");
 
         JButton startButton = new JButton("Start");
+        JButton stopButton = new JButton("Stop");
+        JButton nextButton = new JButton("Next");
+        JButton saveButton = new JButton("Save");
+        
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setTime(Integer.parseInt(timeTextField.getText() ));
@@ -85,7 +90,6 @@ public class Grid extends JFrame /*implements Serializable*/{
             }
         });
 
-        JButton stopButton = new JButton("Stop");
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 stop();
@@ -93,14 +97,12 @@ public class Grid extends JFrame /*implements Serializable*/{
             }
         });
 
-        JButton nextButton = new JButton("Next");
         nextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 next();
             }
         });
 
-        JButton saveButton = new JButton("Save");
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 save();
@@ -116,7 +118,7 @@ public class Grid extends JFrame /*implements Serializable*/{
         
         
 
-        JPanel buttonPanel = new JPanel();
+        buttonPanel = new JPanel();
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
         buttonPanel.add(timeTextField);
@@ -156,7 +158,7 @@ public class Grid extends JFrame /*implements Serializable*/{
 
     public void save(){
         //Mentes
-        /*File output=new File("a.ser");
+        File output=new File("a.ser");
 		ObjectOutputStream o=null;
 		try {
 			o = new ObjectOutputStream(new FileOutputStream(output));
@@ -164,14 +166,93 @@ public class Grid extends JFrame /*implements Serializable*/{
 			
             o.close();
         }catch(IOException e) {throw new RuntimeException(e);}
-        */
+        
     }
-    /* 
-     public void run(){
-         setVisible(true);
-         timer.start();
-        } 
-    */
+    
+    public void random(){
+        Random rand = new Random();
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                if(rand.nextDouble(1)<0.3) cells[i][j].changeStatus();
+            }
+        }
+    }
+
+    public void run(){
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                //cells[i][j]= new Cell();
+                final int x = i;
+                final int y = j;
+                cells[x][y].addActionListener(new ActionListener(){
+                    public void actionPerformed(ActionEvent e){
+                        cells[x][y].changeStatus();
+                    }
+                });
+                //g.add(cells[i][j]);
+            }
+        }
+        
+        
+        
+        JButton startButton = new JButton("Start");
+        JButton stopButton = new JButton("Stop");
+        JButton nextButton = new JButton("Next");
+        JButton saveButton = new JButton("Save");
+        final JTextField timeTextField = new JTextField(5);
+        timeTextField.setText(time + "");
+        
+        buttonPanel.removeAll();
+        pack();
+        buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.add(startButton);
+        buttonPanel.add(stopButton);
+        buttonPanel.add(timeTextField);
+        buttonPanel.add(nextButton);
+        buttonPanel.add(saveButton);
+        //buttonPanel.revalidate();
+        //buttonPanel.repaint();
+         
+        add(buttonPanel,BorderLayout.NORTH);
+
+        startButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                setTime(Integer.parseInt(timeTextField.getText() ));
+                timeTextField.setEditable(false);
+                timer.setDelay(time);
+                start();
+            }
+        });
+
+        stopButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                stop();
+                timeTextField.setEditable(true);
+            }
+        });
+
+        nextButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                next();
+            }
+        });
+
+        saveButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                save();
+            }
+        });
+
+        timer= new Timer(time, new ActionListener() {
+            public void actionPerformed(ActionEvent e){
+                updateGrid();
+            }
+        });
+
+        pack();
+        setVisible(true);
+    } 
+    
     public void stop(){
         if(timer != null && timer.isRunning()) timer.stop();
     }
