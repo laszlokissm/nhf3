@@ -5,8 +5,6 @@ public class Cell extends JButton{
     private boolean status;
     Color alive = Color.BLACK;
     Color dead = Color.WHITE;
-    
-    
 
     public Cell(){
         status = false;
@@ -26,9 +24,4 @@ public class Cell extends JButton{
         status = st;
         setBackground(status ? alive : dead);
     }
-    /*private void toggleCellState(int x, int y) {
-            cellState[x][y] = !cellState[x][y];
-            cells[x][y].setBackground(cellState[x][y] ? Color.BLACK : Color.WHITE);
-    }*/
 }
-

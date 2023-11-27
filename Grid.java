@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class Grid extends JFrame implements Serializable{
     //private static final long serialVersionUID = 6529685098267757690L;
@@ -15,21 +16,27 @@ public class Grid extends JFrame implements Serializable{
     int time=100;
     private Cell[][] cells;
     private Timer timer;
-    private int[] neededToBorn;
-    private int[] neededToSurvive;
-    JPanel buttonPanel;
+    private ArrayList<Integer> neededToSurvive;
+    private ArrayList<Integer> neededToBorn;
+    private JPanel buttonPanel;
 
+    /**
+     * @param b szuleteshez szukseges elo szomszedok szamainak listaja Stringben ';'-al elvalaszva
+     * @param s tuleleshez szukseges elo szomszedok szamainak listaja Stringben ';'-al elvalaszva
+     * @param size a grid merete
+     */
     public Grid(String b, String s,int size){
-        neededToBorn = new int[(b.length()+1)/2];
-        neededToSurvive = new int[(s.length()+1)/2];
+        //neededToBorn = new int[(b.length()+1)/2];
+        neededToBorn = new ArrayList<Integer>((b.length()+1)/2);
+        neededToSurvive = new ArrayList<Integer>((s.length()+1)/2);
         String[] tempb = b.split(";");
-        for (int i = 0; i < neededToBorn.length; i++) {
-            neededToBorn[i]=Integer.parseInt(tempb[i]);
+        for (int i = 0; i < neededToBorn.size(); i++) {
+            neededToBorn.add(i, Integer.parseInt(tempb[i]));
         }
 
         String[] temps = s.split(";");
-        for (int i = 0; i < neededToSurvive.length; i++) {
-            neededToSurvive[i]=Integer.parseInt(temps[i]);
+        for (int i = 0; i < neededToSurvive.size(); i++) {
+            neededToBorn.add(i, Integer.parseInt(temps[i]));
         }
 
         /*
@@ -81,6 +88,9 @@ public class Grid extends JFrame implements Serializable{
         JButton nextButton = new JButton("Next");
         JButton saveButton = new JButton("Save");
         
+        final JTextField saveFilenameTextField = new JTextField(8);
+        saveFilenameTextField.setText("filename");
+
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 setTime(Integer.parseInt(timeTextField.getText() ));
@@ -105,25 +115,16 @@ public class Grid extends JFrame implements Serializable{
 
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                save();
+                save(saveFilenameTextField.getText());
             }
         });
-        
-        /*JButton timeButton = new JButton("Set Time");
-        timeButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		setTime(Integer.parseInt(tf.getText() ));
-            }
-        });*/
-        
-        
 
         buttonPanel = new JPanel();
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
         buttonPanel.add(timeTextField);
-        //buttonPanel.add(timeButton);
         buttonPanel.add(nextButton);
+        buttonPanel.add(saveFilenameTextField);
         buttonPanel.add(saveButton);
         add(buttonPanel,BorderLayout.NORTH);
 
@@ -135,40 +136,47 @@ public class Grid extends JFrame implements Serializable{
         setLocationRelativeTo(null);
         setVisible(true);
 
-        
-        
     }
         
+    /**
+     * @param t mennyi idokozonkent frissuljon a sejtautomata
+     */
     public void setTime(int t) {
         time=t;
     }
 
-    public void setGridSize(int s) {
-        gridSize=s;
-    }
-
-    
+    /**
+     * sejtautomatat lepteto timer inditasa
+     */
     public void start(){
         timer.start();
     }
 
+    /**
+     * egyet leptet a sejtautomatan
+     */
     public void next(){
         updateGrid();
     }
 
-    public void save(){
+    /**
+     * kimenti a grid allasat egy fajlba
+     * @param fname fajlnev menteshez
+     */
+    public void save(String fname){
         //Mentes
-        File output=new File("a.ser");
+        File output=new File(fname+".ser");
 		ObjectOutputStream o=null;
 		try {
 			o = new ObjectOutputStream(new FileOutputStream(output));
 			o.writeObject(this);
-			
             o.close();
         }catch(IOException e) {throw new RuntimeException(e);}
-        
     }
     
+    /**
+     * a sejtautomata osszes cellajat veletlenszeru allapotba allitja
+     */
     public void random(){
         Random rand = new Random();
         for (int i = 0; i < gridSize; i++) {
@@ -178,10 +186,12 @@ public class Grid extends JFrame implements Serializable{
         }
     }
 
+    /**
+     * a betoltes utan ez a fuggveny ujra hozzaadja a Gridhez a funkciokat
+     */
     public void run(){
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                //cells[i][j]= new Cell();
                 final int x = i;
                 final int y = j;
                 cells[x][y].addActionListener(new ActionListener(){
@@ -189,7 +199,6 @@ public class Grid extends JFrame implements Serializable{
                         cells[x][y].changeStatus();
                     }
                 });
-                //g.add(cells[i][j]);
             }
         }
         
@@ -201,6 +210,8 @@ public class Grid extends JFrame implements Serializable{
         JButton saveButton = new JButton("Save");
         final JTextField timeTextField = new JTextField(5);
         timeTextField.setText(time + "");
+        final JTextField saveFilenameTextField = new JTextField(8);
+        saveFilenameTextField.setText("filename");
         
         buttonPanel.removeAll();
         pack();
@@ -209,10 +220,8 @@ public class Grid extends JFrame implements Serializable{
         buttonPanel.add(stopButton);
         buttonPanel.add(timeTextField);
         buttonPanel.add(nextButton);
+        buttonPanel.add(saveFilenameTextField);
         buttonPanel.add(saveButton);
-        //buttonPanel.revalidate();
-        //buttonPanel.repaint();
-         
         add(buttonPanel,BorderLayout.NORTH);
 
         startButton.addActionListener(new ActionListener() {
@@ -239,7 +248,7 @@ public class Grid extends JFrame implements Serializable{
 
         saveButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                save();
+                save(saveFilenameTextField.getText());
             }
         });
 
@@ -258,8 +267,6 @@ public class Grid extends JFrame implements Serializable{
     }
 
     public void updateGrid(){
-        //Cell[][] newCells = cells;
-
         boolean[][] newStatus = new boolean[gridSize][gridSize];
 
         for (int i = 0; i < gridSize; i++) {
@@ -268,24 +275,21 @@ public class Grid extends JFrame implements Serializable{
 
                 if(cells[i][j].getStatus()){
                     boolean doesItSurvive=false;
-                    for (int k = 0; k < neededToSurvive.length; k++) {
-                        if (n==neededToSurvive[k]) {
+                    for (int k = 0; k < neededToSurvive.size(); k++) {
+                        if (n==neededToSurvive.get(k)) {
                             doesItSurvive=true;
                         }
                     }
-                    //newCells[i][j].setStatus(doesItSurvive);
                     newStatus[i][j]=doesItSurvive;
                 }else{
                     boolean isItBorn=false;
-                    for (int k = 0; k < neededToBorn.length; k++) {
-                        if (n==neededToBorn[k]) {
+                    for (int k = 0; k < neededToBorn.size(); k++) {
+                        if (n==neededToBorn.get(k)) {
                             isItBorn=true;
                         }
                     }
-                    //newCells[i][j].setStatus(isItBorn);
                     newStatus[i][j]=isItBorn;
                 }
-                //cells[i][j].setBackground(newStatus[i][j] ? Color.BLACK : Color.WHITE);
             }
         }
 
@@ -294,20 +298,22 @@ public class Grid extends JFrame implements Serializable{
                 cells[i][j].setStatus(newStatus[i][j]);
             }
         }
-        
     }
 
+    /**
+     * @param x egy cella x koordinataja
+     * @param y egy cella y koordinataja
+     * @return az (x,y) helyen talalhato cella elo szomszedainak szama
+     */
     public int neighborhood(int x, int y){
         int c=0;
         for(int i = x-1;i<=x+1;i++){
             for (int j = y-1; j <= y+1; j++) {
                 if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && !(i == x && j == y)) {
                     if (cells[i][j].getStatus()==true) c++;
-                    //c+= cells[x][y].getStatus() ? 1 : 0;
                 }
             }
         }
         return c;
     }
-        
 }
