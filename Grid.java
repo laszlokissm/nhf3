@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,8 +9,6 @@ import java.util.Random;
 import java.util.ArrayList;
 
 public class Grid extends JFrame implements Serializable{
-    //private static final long serialVersionUID = 6529685098267757690L;
-    
     private int gridSize = 50;
     int time=100;
     private Cell[][] cells;
@@ -26,99 +23,71 @@ public class Grid extends JFrame implements Serializable{
      * @param size a grid merete
      */
     public Grid(String b, String s,int size){
-        //neededToBorn = new int[(b.length()+1)/2];
-        neededToBorn = new ArrayList<Integer>((b.length()+1)/2);
-        neededToSurvive = new ArrayList<Integer>((s.length()+1)/2);
+        setTitle("Sejtautomata");
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        
+        //Parameterkent kapott adatok atalakitasa
+        neededToBorn = new ArrayList<>((b.length()+1)/2);
         String[] tempb = b.split(";");
         for (int i = 0; i < neededToBorn.size(); i++) {
             neededToBorn.add(i, Integer.parseInt(tempb[i]));
         }
-
+        
+        neededToSurvive = new ArrayList<>((s.length()+1)/2);
         String[] temps = s.split(";");
         for (int i = 0; i < neededToSurvive.size(); i++) {
             neededToBorn.add(i, Integer.parseInt(temps[i]));
         }
 
-        /*
-         * Check int arrays
-         */
-        /*for (int i = 0; i < neededToBorn.length; i++) {
-            System.out.println(neededToBorn[i]);
-        }
-        for (int i = 0; i < neededToSurvive.length; i++) {
-            System.out.println(neededToSurvive[i]);
-        }*/
-
-        timer= new Timer(time, new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                updateGrid();
-            }
-        });
-        
         gridSize=size;
-        setTitle("Sejtautomata");
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
+        //Timer inicializalasa
+        timer= new Timer(time, e -> updateGrid());
+        
+        //Grid es cellak inicializálása
         cells = new Cell[gridSize][gridSize];
         JPanel g = new JPanel();
         g.setLayout(new GridLayout(gridSize, gridSize));
-        
-        //Grid inicializálása
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 cells[i][j]= new Cell();
                 final int x = i;
                 final int y = j;
-                cells[x][y].addActionListener(new ActionListener(){
-                    public void actionPerformed(ActionEvent e){
-                        cells[x][y].changeStatus();
-                    }
-                });
+                cells[x][y].addActionListener(e -> cells[x][y].changeStatus());
                 g.add(cells[i][j]);
             }
         }
         
         add(g,BorderLayout.CENTER);
         
+        //Menu elemeinek letrehozasa
         final JTextField timeTextField = new JTextField(5);
         timeTextField.setText(time + "");
-
+        final JTextField saveFilenameTextField = new JTextField(8);
+        saveFilenameTextField.setText("filename");
         JButton startButton = new JButton("Start");
         JButton stopButton = new JButton("Stop");
         JButton nextButton = new JButton("Next");
         JButton saveButton = new JButton("Save");
         
-        final JTextField saveFilenameTextField = new JTextField(8);
-        saveFilenameTextField.setText("filename");
-
-        startButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setTime(Integer.parseInt(timeTextField.getText() ));
-                timeTextField.setEditable(false);
-                timer.setDelay(time);
-                start();
-            }
+        //Menu funkcioinak letrehozasa
+        startButton.addActionListener(e -> {
+            setTime(Integer.parseInt(timeTextField.getText()));
+            timeTextField.setEditable(false);
+            timer.setDelay(time);
+            start();
         });
 
-        stopButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                stop();
-                timeTextField.setEditable(true);
-            }
+        stopButton.addActionListener(e -> {
+            stop();
+            timeTextField.setEditable(true);
         });
 
-        nextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                next();
-            }
-        });
+        nextButton.addActionListener(e -> next());
 
-        saveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                save(saveFilenameTextField.getText());
-            }
-        });
+        saveButton.addActionListener(e -> save(saveFilenameTextField.getText()));
 
+        //Menu elemeinek elrendezese
         buttonPanel = new JPanel();
         buttonPanel.add(startButton);
         buttonPanel.add(stopButton);
@@ -161,17 +130,16 @@ public class Grid extends JFrame implements Serializable{
 
     /**
      * kimenti a grid allasat egy fajlba
-     * @param fname fajlnev menteshez
+     * @param fname fajlnev
      */
     public void save(String fname){
-        //Mentes
         File output=new File(fname+".ser");
 		ObjectOutputStream o=null;
 		try {
 			o = new ObjectOutputStream(new FileOutputStream(output));
 			o.writeObject(this);
             o.close();
-        }catch(IOException e) {throw new RuntimeException(e);}
+        }catch(IOException e) {e.printStackTrace();}
     }
     
     /**
@@ -190,20 +158,17 @@ public class Grid extends JFrame implements Serializable{
      * a betoltes utan ez a fuggveny ujra hozzaadja a Gridhez a funkciokat
      */
     public void run(){
+        //Cellakhoz funkciok hozzaadasa
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 final int x = i;
                 final int y = j;
-                cells[x][y].addActionListener(new ActionListener(){
-                    public void actionPerformed(ActionEvent e){
-                        cells[x][y].changeStatus();
-                    }
-                });
+                cells[x][y].addActionListener(e -> cells[x][y].changeStatus());
             }
         }
         
         
-        
+        //Menu elemeinek ujra letrehozasa
         JButton startButton = new JButton("Start");
         JButton stopButton = new JButton("Stop");
         JButton nextButton = new JButton("Next");
@@ -213,6 +178,7 @@ public class Grid extends JFrame implements Serializable{
         final JTextField saveFilenameTextField = new JTextField(8);
         saveFilenameTextField.setText("filename");
         
+        //buttonPanel ujraepitese
         buttonPanel.removeAll();
         pack();
         buttonPanel = new JPanel(new FlowLayout());
@@ -224,39 +190,24 @@ public class Grid extends JFrame implements Serializable{
         buttonPanel.add(saveButton);
         add(buttonPanel,BorderLayout.NORTH);
 
-        startButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setTime(Integer.parseInt(timeTextField.getText() ));
-                timeTextField.setEditable(false);
-                timer.setDelay(time);
-                start();
-            }
+        //Menu funkcioinak ujra hozzaadasa
+        startButton.addActionListener(e -> {
+            setTime(Integer.parseInt(timeTextField.getText() ));
+            timeTextField.setEditable(false);
+            timer.setDelay(time);
+            start();
         });
 
-        stopButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                stop();
-                timeTextField.setEditable(true);
-            }
+        stopButton.addActionListener(e -> {
+            stop();
+            timeTextField.setEditable(true);
         });
 
-        nextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                next();
-            }
-        });
+        nextButton.addActionListener(e -> next());
 
-        saveButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                save(saveFilenameTextField.getText());
-            }
-        });
+        saveButton.addActionListener(e -> save(saveFilenameTextField.getText()));
 
-        timer= new Timer(time, new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                updateGrid();
-            }
-        });
+        timer= new Timer(time, e -> updateGrid());
 
         pack();
         setVisible(true);
@@ -266,7 +217,11 @@ public class Grid extends JFrame implements Serializable{
         if(timer != null && timer.isRunning()) timer.stop();
     }
 
+    /**
+     * A gridet a kovetkezo allapotba allitja. 
+     */
     public void updateGrid(){
+        //Ez a cellak uj allapota
         boolean[][] newStatus = new boolean[gridSize][gridSize];
 
         for (int i = 0; i < gridSize; i++) {
@@ -281,7 +236,8 @@ public class Grid extends JFrame implements Serializable{
                         }
                     }
                     newStatus[i][j]=doesItSurvive;
-                }else{
+                }
+                else{
                     boolean isItBorn=false;
                     for (int k = 0; k < neededToBorn.size(); k++) {
                         if (n==neededToBorn.get(k)) {
@@ -293,6 +249,7 @@ public class Grid extends JFrame implements Serializable{
             }
         }
 
+        //Cellak allapotanak frissitese
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 cells[i][j].setStatus(newStatus[i][j]);
@@ -309,8 +266,8 @@ public class Grid extends JFrame implements Serializable{
         int c=0;
         for(int i = x-1;i<=x+1;i++){
             for (int j = y-1; j <= y+1; j++) {
-                if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && !(i == x && j == y)) {
-                    if (cells[i][j].getStatus()==true) c++;
+                if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && !(i == x && j == y) && (cells[i][j].getStatus())) {
+                    c++;
                 }
             }
         }

@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,8 +16,9 @@ public class Main extends JFrame {
      */
     public Main(){
         setTitle("Sejtautomata");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        //Fomenu elemeinek letrehozasa
         JButton startButton = new JButton("Inditas");
         JButton exitButton = new JButton("Kilepes");
         JButton loadButton = new JButton("Betoltes");
@@ -35,6 +35,13 @@ public class Main extends JFrame {
         JPanel botButtonsPanel = new JPanel(new BorderLayout());
         JPanel topButtonsPanel = new JPanel(new BorderLayout());
         JPanel loadPanel = new JPanel();
+        
+        bornTextField.setText(born+"");
+        surviveTextField.setText(survive+"");
+        sizeTextField.setText(size+"");
+        loadFilenameTextField.setText("filename");
+
+        //Fomenu letrehozasa
         loadPanel.add(loadLabel);
         loadPanel.add(loadFilenameTextField);
         botButtonsPanel.add(loadPanel,BorderLayout.NORTH);
@@ -51,57 +58,37 @@ public class Main extends JFrame {
         add(topButtonsPanel,BorderLayout.NORTH);
         add(fields,BorderLayout.CENTER);
         add(botButtonsPanel,BorderLayout.SOUTH);
+        
 
-        bornTextField.setText(born+"");
-        surviveTextField.setText(survive+"");
-        sizeTextField.setText(size+"");
-        loadFilenameTextField.setText("filename");
-
-
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                System.exit(0);
-            }
+        //Fomenu funkcioinak letrehozasa
+        exitButton.addActionListener(e -> System.exit(0));        
+        
+        loadButton.addActionListener(e -> {
+            File input=new File(loadFilenameTextField.getText()+".ser");
+            ObjectInputStream o=null;
+            try {
+                o = new ObjectInputStream(new FileInputStream(input));
+                g = (Grid)o.readObject();
+                g.run();
+                o.close();
+            }catch(IOException | ClassNotFoundException err ) {err.printStackTrace();}
         });
         
-        
-        loadButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                File input=new File(loadFilenameTextField.getText()+".ser");
-		        ObjectInputStream o=null;
-		        try {
-			        o = new ObjectInputStream(new FileInputStream(input));
-			        g = (Grid)o.readObject();
-                    g.run();
-                    o.close();
-		        }catch(IOException | ClassNotFoundException err ) {throw new RuntimeException(err);}
-                
-            }
-        });
-        
-        startButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                setBorn(bornTextField.getText());
-                setSurvive(surviveTextField.getText());
-                if(sizeTextField.getText()!=null) setSize(Integer.parseInt(sizeTextField.getText()));
-                
-                g = new Grid(born, survive, size);
-                
-
-            }
+        startButton.addActionListener(e -> {
+            if(bornTextField.getText()!=null) setBorn(bornTextField.getText());
+            if(surviveTextField.getText()!=null) setSurvive(surviveTextField.getText());
+            if(sizeTextField.getText()!=null) setSize(Integer.parseInt(sizeTextField.getText()));
+            
+            g = new Grid(born, survive, size);
         });
 
-        randomButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e){
-                setBorn(bornTextField.getText());
-                setSurvive(surviveTextField.getText());
-                if(sizeTextField.getText()!=null) setSize(Integer.parseInt(sizeTextField.getText()));
-                
-                g = new Grid(born, survive, size);
-                g.random();
-                
-
-            }
+        randomButton.addActionListener(e -> {
+            setBorn(bornTextField.getText());
+            setSurvive(surviveTextField.getText());
+            if(sizeTextField.getText()!=null) setSize(Integer.parseInt(sizeTextField.getText()));
+ 
+            g = new Grid(born, survive, size);
+            g.random();
         });
 
 
@@ -110,7 +97,7 @@ public class Main extends JFrame {
         setVisible(true);
     }
 
-    //Setterek es Getterek
+    //Setterek
 
     public void setBorn(String born) {
         this.born = born;
@@ -122,14 +109,6 @@ public class Main extends JFrame {
 
     public void setSize(int size) {
         this.size = size;
-    }
-
-    public String getSurvive() {
-        return survive;
-    }
-
-    public String getBorn() {
-        return born;
     }
 
     public static void main(String[] args){
