@@ -264,7 +264,7 @@ public class Grid extends JFrame implements Serializable{
 
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                int n = neighbors(i, j);
+                int n = neighborhood(i, j);
 
                 if(cells[i][j].getStatus()){
                     boolean doesItSurvive=false;
@@ -297,7 +297,7 @@ public class Grid extends JFrame implements Serializable{
         
     }
 
-    public int neighbors(int x, int y){
+    public int neighborhood(int x, int y){
         int c=0;
         for(int i = x-1;i<=x+1;i++){
             for (int j = y-1; j <= y+1; j++) {
