@@ -301,9 +301,9 @@ public class Grid extends JFrame implements Serializable{
         int c=0;
         for(int i = x-1;i<=x+1;i++){
             for (int j = y-1; j <= y+1; j++) {
-                if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && !(i == x && j == y)) {
-                    if (cells[i][j].getStatus()==true) c++;
-                    //c+= cells[x][y].getStatus() ? 1 : 0;
+                if (i >= 0 && i < gridSize && j >= 0 && j < gridSize && !(i == x && j == y) && (cells[i][j].getStatus()) 
+                ){
+                    c++;
                 }
             }
         }
