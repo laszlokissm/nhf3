@@ -267,7 +267,7 @@ public class Grid extends JFrame implements Serializable{
 
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                int n = neighbors(i, j);
+                int n = neighborhood(i, j);
 
                 if(cells[i][j].getStatus()){
                     boolean doesItSurvive=false;
@@ -278,6 +278,7 @@ public class Grid extends JFrame implements Serializable{
                     }
                     //newCells[i][j].setStatus(doesItSurvive);
                     newStatus[i][j]=doesItSurvive;
+                    cells[i][j].setStatus(doesItSurvive);
                 }else{
                     boolean isItBorn=false;
                     for (int k = 0; k < neededToBorn.length; k++) {
@@ -287,20 +288,21 @@ public class Grid extends JFrame implements Serializable{
                     }
                     //newCells[i][j].setStatus(isItBorn);
                     newStatus[i][j]=isItBorn;
+                    cells[i][j].setStatus(isItBorn);
                 }
                 //cells[i][j].setBackground(newStatus[i][j] ? Color.BLACK : Color.WHITE);
             }
         }
 
-        for (int i = 0; i < gridSize; i++) {
+        /*for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 cells[i][j].setStatus(newStatus[i][j]);
             }
-        }
+        }*/
         
     }
 
-    public int neighbors(int x, int y){
+    public int neighborhood(int x, int y){
         int c=0;
         for(int i = x-1;i<=x+1;i++){
             for (int j = y-1; j <= y+1; j++) {
